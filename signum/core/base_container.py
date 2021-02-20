@@ -318,9 +318,30 @@ class SignalContainer(np.ndarray):
 
     @property
     def phase(self):
-        ph = np.rad2deg(np.unwrap(np.angle(self))).view(self.__class__)
+        return self.get_phase()
+
+    def get_phase(self, rad=False, unwrapped=True):
+        """Calculate phase of the signal.
+
+        Parameters
+        ----------
+        rad         :   bool
+            if True, return the phase in radians; otherwise (default) - use degrees
+        unwrapped   :   bool
+            if True (default), unwrap the phase to avoid 2pi jumps; otherwise, return the phase limited to (-pi, pi)
+            or (-180, 180), depending on the desired unit
+        """
+
+        ph = np.angle(self)
+        if unwrapped:
+            ph = np.unwrap(ph)
+        if not rad:
+            ph = np.rad2deg(ph)
+
+        ph = ph.view(self.__class__)
         ph.copy_attributes(self)
-        ph.unit = 'deg'
+        ph.unit = 'rad' if rad else 'deg'
+        ph.description = (ph.description or '') + ' (phase)'
         return ph
 
     def display(self, complex_plot: str = 'bode', show: bool = True, **kwargs):
