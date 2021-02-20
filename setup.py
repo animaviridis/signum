@@ -15,10 +15,13 @@ setuptools.setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/savetheginger/signum",
-    packages=setuptools.find_packages(),
+    packages=['signum'],
     python_requires='>=3.7',
     install_requires=[
         'numpy>=1.16',
         'matplotlib'
-    ]
+    ],
+    extras_require={
+        'examples': ['notebook']  # jupyter notebook
+    }
 )
