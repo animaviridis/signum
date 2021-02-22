@@ -8,14 +8,14 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="signum",
-    version="0.1.0",
+    version="0.1.1",
     author="savetheginger",
     author_email="mysh995@gmail.com",
     description="NumPy-based signal data container tools",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/savetheginger/signum",
-    packages=['signum'],
+    packages=setuptools.find_packages(exclude=('examples',)),
     python_requires='>=3.7',
     install_requires=[
         'numpy>=1.16',
