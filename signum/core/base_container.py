@@ -345,7 +345,7 @@ class SignalContainer(np.ndarray):
         ph.description = (ph.description or '') + ' (phase)'
         return ph
 
-    def display(self, complex_plot: str = 'bode', show: bool = True, **kwargs):
+    def display(self, complex_plot: str = 'bode', show: bool = True, title: str = None, **kwargs):
         """Create a plot to display the data.
 
         Parameters
@@ -355,6 +355,8 @@ class SignalContainer(np.ndarray):
             'bode', 'nyquist', 'iq'. For real-valued data, this argument is ignored.
         show            :   bool
             if True, display the plot; setting to False allows later customisation before displaying it
+        title           :   str
+            title for the plot; if not provided, the description of the signal is used
         kwargs
             additional keyword arguments passed to the specific plotting methods (or matplotlib.pyplot.plot)
         """
@@ -378,14 +380,14 @@ class SignalContainer(np.ndarray):
         if complex_plot != 'nyquist':
             adjust_plot_scale(axes[-1], x_unit=self.x_unit, x_label=self.x_description)
 
-        fig.suptitle(self.description, fontsize=14)
+        fig.suptitle(title or self.description, fontsize=14)
 
         if show:
             plt.show()
 
         return fig, axes
 
-    def _display_complex_bode(self, db_scale: bool = False, rad=False, unwrapped=False, **kwargs):
+    def _display_complex_bode(self, db_scale: bool = False, rad=False, unwrapped=False, figsize=(8, 6), **kwargs):
         """Display a complex signal in a form of Bode plot (magnitude and phase).
 
         Parameters
@@ -397,9 +399,11 @@ class SignalContainer(np.ndarray):
         unwrapped   :   bool
             if True, unwrap the phase to avoid 2pi (or 180 deg) jumps; otherwise, show phase in (-pi, pi) range
             (or (-180, 180) for degrees)
+        figsize     :   2-tuple
+            figure size (passed to plt.subplots)
         """
 
-        fig, axes = plt.subplots(2, 1, sharex='all')
+        fig, axes = plt.subplots(2, 1, sharex='all', figsize=figsize)
 
         mag = self.magnitude_db if db_scale else self.magnitude
         axes[0].plot(mag.x_axis, mag, **kwargs)
@@ -411,16 +415,18 @@ class SignalContainer(np.ndarray):
 
         return fig, axes
 
-    def _display_complex_iq(self, sharey='all', **kwargs):
+    def _display_complex_iq(self, sharey='all', figsize=(8, 6), **kwargs):
         """Display a complex signal in two subplots: real and imaginary part separately.
 
         Parameters
         ----------
         sharey  :   str or bool
             passed to matplotlib.pyplot.subplots; if 'all' (or True), the y axis of both subplots is shared.
+        figsize     :   2-tuple
+            figure size (passed to plt.subplots)
         """
 
-        fig, axes = plt.subplots(2, 1, sharex='all', sharey=sharey)
+        fig, axes = plt.subplots(2, 1, sharex='all', sharey=sharey, figsize=figsize)
 
         axes[0].plot(self.x_axis, self.real, **kwargs)
         adjust_plot_scale(axes[0], y_unit=self.unit, y_label="Real part")
@@ -430,10 +436,10 @@ class SignalContainer(np.ndarray):
 
         return fig, axes
 
-    def _display_complex_nyquist(self, **kwargs):
+    def _display_complex_nyquist(self, figsize=(6, 6), **kwargs):
         """Display a complex-valued signal in a form of a Nyquist plot (imaginary vs real part)."""
 
-        fig, ax = plt.subplots()
+        fig, ax = plt.subplots(figsize=figsize)
         axes = np.array([ax])
 
         ax.set_aspect('equal')
@@ -450,10 +456,10 @@ class SignalContainer(np.ndarray):
 
         return fig, axes
 
-    def _display_real(self, **kwargs):
+    def _display_real(self, figsize=(8, 5), **kwargs):
         """Display a real-valued signal."""
 
-        fig, ax = plt.subplots()
+        fig, ax = plt.subplots(figsize=figsize)
         axes = np.array([ax])
 
         ax.plot(self.x_axis, self, **kwargs)
