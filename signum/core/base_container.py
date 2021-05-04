@@ -311,8 +311,9 @@ class SignalContainer(np.ndarray):
 
     @property
     def magnitude_db(self):
-        mag_db = 20 * np.log10(self.magnitude)
+        mag_db = 20 * np.log10(np.abs(self))  # TODO: dB for power quantities
         mag_db.unit = 'dB'
+        mag_db.description = (self.description or '') + f'(magnitude, dB)'
         return mag_db
 
     @property
