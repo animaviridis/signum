@@ -291,7 +291,7 @@ class SignalContainer(np.ndarray):
         if not len(val) == self.shape[0]:
             raise ValueError(f"Length of the x axis ({len(val)}) does not match the signal shape ({self.shape})")
 
-        self._nonstandard_x_axis = val
+        self._nonstandard_x_axis = np.array(val)
 
         if val is not None:
             self.x_start = 0
