@@ -270,7 +270,6 @@ class SignalContainer(np.ndarray):
 
     def _resolution_defaults_setter(self):
         self._base_resolution = 1
-        self._nonstandard_x_axis = None
 
     @property
     def x_axis(self):
