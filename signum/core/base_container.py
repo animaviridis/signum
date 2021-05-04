@@ -331,7 +331,9 @@ class SignalContainer(np.ndarray):
             or (-180, 180), depending on the desired unit
         """
 
-        ph = np.angle(self)
+        ph = np.angle(self)  # phase in radians
+        ph = np.deg2rad((np.rad2deg(ph) % 180) - 360)  # convert the phase properly to (-pi, pi)
+
         if unwrapped:
             ph = np.unwrap(ph)
         if not rad:
@@ -383,13 +385,18 @@ class SignalContainer(np.ndarray):
 
         return fig, axes
 
-    def _display_complex_bode(self, db_scale: bool = False, **kwargs):
+    def _display_complex_bode(self, db_scale: bool = False, rad=False, unwrapped=False, **kwargs):
         """Display a complex signal in a form of Bode plot (magnitude and phase).
 
         Parameters
         ----------
         db_scale    :   bool
             if True, display the magnitude in decibels.
+        rad         :   bool
+            if True, display the phase in radians; otherwise, use degrees
+        unwrapped   :   bool
+            if True, unwrap the phase to avoid 2pi (or 180 deg) jumps; otherwise, show phase in (-pi, pi) range
+            (or (-180, 180) for degrees)
         """
 
         fig, axes = plt.subplots(2, 1, sharex='all')
@@ -398,7 +405,7 @@ class SignalContainer(np.ndarray):
         axes[0].plot(mag.x_axis, mag, **kwargs)
         adjust_plot_scale(axes[0], y_unit=mag.unit if not db_scale else None, y_label="Magnitude")
 
-        phase = self.phase
+        phase = self.get_phase(rad=rad, unwrapped=unwrapped)
         axes[1].plot(phase.x_axis, phase, **kwargs)
         axes[1].set_ylabel(f"Phase [{phase.unit}]")
 
