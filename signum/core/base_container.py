@@ -333,7 +333,6 @@ class SignalContainer(np.ndarray):
         """
 
         ph = np.angle(self)  # phase in radians
-        ph = np.deg2rad((np.rad2deg(ph) % 180) - 360)  # convert the phase properly to (-pi, pi)
 
         if unwrapped:
             ph = np.unwrap(ph)
