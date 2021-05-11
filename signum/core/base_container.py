@@ -253,7 +253,7 @@ class SignalContainer(np.ndarray):
             if not isinstance(item, slice) or self._nonstandard_x_axis is not None:
                 res._nonstandard_x_axis = self.x_axis[item]  # nonstandard choice of indices
             else:
-                res.x_start = self.x_axis[item][0]
+                res.x_start = self.x_axis[item][0] if res.size else (self.x_axis[0] if self.size else 0)
                 if item.step is not None:
                     res._base_resolution *= item.step
 
