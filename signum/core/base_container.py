@@ -361,6 +361,9 @@ class SignalContainer(np.ndarray):
             additional keyword arguments passed to the specific plotting methods (or matplotlib.pyplot.plot)
         """
 
+        if self.size < 2:
+            kwargs['marker'] = kwargs.get('marker', 'o')  # put a single dot if there is only one data point
+
         if np.iscomplexobj(self):
             if complex_plot == 'bode':
                 fig, axes = self._display_complex_bode(**kwargs)
