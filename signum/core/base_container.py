@@ -277,7 +277,7 @@ class SignalContainer(np.ndarray):
             return self._nonstandard_x_axis
 
         x0 = self.x_start if self.x_start is not None else 0
-        return x0 + np.arange(self.shape[0]) * self.resolution
+        return x0 + np.arange(self.shape[-1]) * self.resolution
 
     @x_axis.setter
     def x_axis(self, val):
@@ -287,7 +287,7 @@ class SignalContainer(np.ndarray):
         if not isinstance(val, (abc.Sequence, abc.Iterable)):
             raise TypeError("x axis should be a sequence")
 
-        if not len(val) == self.shape[0]:
+        if not len(val) == self.shape[-1]:
             raise ValueError(f"Length of the x axis ({len(val)}) does not match the signal shape ({self.shape})")
 
         self._nonstandard_x_axis = np.array(val)
