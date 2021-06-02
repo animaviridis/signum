@@ -5,6 +5,7 @@ import numpy as np
 import logging
 from collections import abc
 from typing import Iterable, List, NamedTuple, Any
+from numbers import Number
 
 from signum.tools.plotting_tools import adjust_plot_scale
 
@@ -247,15 +248,13 @@ class SignalContainer(np.ndarray):
         res = super().__getitem__(item)
 
         if isinstance(res, type(self)):
-            if isinstance(item, tuple):
-                item = item[0]
+            if isinstance(item, (Number, slice, np.ndarray)):
+                item = (item, )
 
-            if not isinstance(item, slice) or self._nonstandard_x_axis is not None:
-                res._nonstandard_x_axis = self.x_axis[item]  # nonstandard choice of indices
-            else:
-                res.x_start = self.x_axis[item][0] if res.size else (self.x_axis[0] if self.size else 0)
-                if item.step is not None:
-                    res._base_resolution *= item.step
+            if isinstance(item, tuple):
+                item = item[(self.ndim - self.x_axis.ndim):]
+
+            res._nonstandard_x_axis = self.x_axis[item]  # nonstandard choice of indices
 
         return res
 
