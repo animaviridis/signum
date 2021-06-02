@@ -409,11 +409,11 @@ class SignalContainer(np.ndarray):
         fig, axes = plt.subplots(2, 1, sharex='all', figsize=figsize)
 
         mag = self.magnitude_db if db_scale else self.magnitude
-        axes[0].plot(mag.x_axis, mag, **kwargs)
+        axes[0].plot(mag.x_axis, mag.T, **kwargs)
         adjust_plot_scale(axes[0], y_unit=mag.unit if not db_scale else None, y_label="Magnitude")
 
         phase = self.get_phase(rad=rad, unwrapped=unwrapped)
-        axes[1].plot(phase.x_axis, phase, **kwargs)
+        axes[1].plot(phase.x_axis, phase.T, **kwargs)
         axes[1].set_ylabel(f"Phase [{phase.unit}]")
 
         return fig, axes
@@ -431,10 +431,10 @@ class SignalContainer(np.ndarray):
 
         fig, axes = plt.subplots(2, 1, sharex='all', sharey=sharey, figsize=figsize)
 
-        axes[0].plot(self.x_axis, self.real, **kwargs)
+        axes[0].plot(self.x_axis, self.real.T, **kwargs)
         adjust_plot_scale(axes[0], y_unit=self.unit, y_label="Real part")
 
-        axes[1].plot(self.x_axis, self.imag, **kwargs)
+        axes[1].plot(self.x_axis, self.imag.T, **kwargs)
         adjust_plot_scale(axes[1], y_unit=self.unit, y_label="Imaginary part")
 
         return fig, axes
@@ -446,7 +446,7 @@ class SignalContainer(np.ndarray):
         axes = np.array([ax])
 
         ax.set_aspect('equal')
-        ax.plot(self.real, self.imag, **kwargs)
+        ax.plot(self.real.T, self.imag.T, **kwargs)
 
         ax.axvline(0, color='k', zorder=1)
         ax.axhline(0, color='k', zorder=1)
@@ -465,7 +465,7 @@ class SignalContainer(np.ndarray):
         fig, ax = plt.subplots(figsize=figsize)
         axes = np.array([ax])
 
-        ax.plot(self.x_axis, self, **kwargs)
+        ax.plot(self.x_axis, self.T, **kwargs)
         adjust_plot_scale(ax, y_unit=self.unit, y_label=self.description)
 
         return fig, axes
