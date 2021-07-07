@@ -7,36 +7,33 @@ from signum.core.time_domain_signal import BaseTimeDomainSignal as BaseTimeDomai
 
 
 class TimeDomainSignal(BaseTimeDomainSignal):
-    @staticmethod
-    def csd(x, y=None, **kwargs):
+    def csd(self, other=None, **kwargs):
         """Cross spectral density"""
 
-        y_in = y if y is not None else x
+        if other is None:
+            description = f"{self.description}: power spectral density"
+            meta = {**self.meta, 'original_description': self.description}
+            other = self
 
-        # check that the operation is applicable to the inputs
-        TimeDomainSignal.check_metadata(x, y_in, require_type=True)
+        else:
+            # check that the operation is applicable to the inputs
+            self.check_metadata(self, other, require_type=True)
+
+            description = f"{self.description} & {other.description}: cross spectral density"
+            meta = {**self.meta, **other.meta, 'original_descriptions': [self.description, other.description]}
 
         # calculate the spectrum
-        spectrum, frequencies = mlab.csd(y_in, x, **kwargs, Fs=x.f_sampling)
-
-        # cast type to FreqDomainSingal
-        if y is None:
-            description = f"{x.description}: power spectral density"
-            meta = {**x.meta, 'original_description': x.description}
-        else:
-            description = f"{x.description} & {y.description}: cross spectral density"
-            meta = {**x.meta, **y.meta, 'original_descriptions': [x.description, y.description]}
+        spectrum, frequencies = mlab.csd(other, self, **kwargs, Fs=self.f_sampling)
 
         spectrum = FreqDomainSignal(spectrum, f_resolution=frequencies[1] - frequencies[0], x_start=frequencies[0],
-                                    description=description, meta=meta, unit=x.unit)
+                                    description=description, meta=meta, unit=self.unit)
 
         return spectrum
 
-    @staticmethod
-    def psd(x, **kwargs):
+    def psd(self, **kwargs):
         """Power spectral density"""
 
-        return TimeDomainSignal.csd(x, **kwargs)
+        return self.csd(other=None, **kwargs)
 
 
 class FreqDomainSignal(BaseFreqDomainSignal):
@@ -51,10 +48,10 @@ if __name__ == '__main__':
 
     tdata1.display()
 
-    psd = TimeDomainSignal.psd(tdata1)
+    psd = tdata1.psd()
     psd.display()
 
-    csd = TimeDomainSignal.csd(tdata1, tdata3)
+    csd = tdata1.csd(tdata3)
     csd.display()
 
     # freq domain
