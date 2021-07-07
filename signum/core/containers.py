@@ -1,9 +1,13 @@
 import numpy as np
 from matplotlib import mlab
+import logging
 
-
+from signum.tools.scale_manager import ScaleManager
 from signum.core.freq_domain_signal import BaseFreqDomainSignal as BaseFreqDomainSignal
 from signum.core.time_domain_signal import BaseTimeDomainSignal as BaseTimeDomainSignal
+
+
+logger = logging.getLogger(__name__)
 
 
 class TimeDomainSignal(BaseTimeDomainSignal):
@@ -35,38 +39,53 @@ class TimeDomainSignal(BaseTimeDomainSignal):
 
         return self.csd(other=None, **kwargs)
 
-    def fft(self, zero_centered=False, axis=-1, description='', **kwargs):
+    def fft(self, axis=-1, description='', **kwargs):
         self._check_x_axis_spacing("a Fourier transform")
 
         f = np.fft.fft(self, axis=axis, **kwargs)
-        if zero_centered:
-            f = np.fft.fftshift(f)
 
         ns = self.shape[axis]
         f_resolution = self.f_sampling/ns
-        f_start = - f_resolution * (ns//2) if zero_centered else 0
         description = description or (f"FFT of {self.description}" if self.description else '')
 
-        f = FreqDomainSignal(f, f_resolution=f_resolution, description=description, meta=self.meta, unit=self.unit,
-                             x_start=f_start)
+        f = FreqDomainSignal(f, f_resolution=f_resolution, description=description, meta=self.meta, unit=self.unit)
 
         return f
 
 
 class FreqDomainSignal(BaseFreqDomainSignal):
-    def ifft(self, zero_centered=False, axis=-1, description='', **kwargs):
+    def ifft(self, axis=-1, description='', **kwargs):
         self._check_x_axis_spacing("an inverse Fourier transform")
 
         ns = self.shape[axis]
         f_sampling = self.f_resolution * ns
         description = description or (f"Inverse FFT of {self.description}" if self.description else '')
 
-        # perform an inverse fft shift if the spectrum is zero-centered
-        f = np.fft.ifftshift(self) if zero_centered else self.toarray()
+        if self.x_axis[0]:
+            logger.warning(f"The first element of the array appears not to be the zero-frequency term (based on the "
+                           f"frequency axis: {ScaleManager.display(self.x_axis[0], 'Hz')})")
 
-        t = np.fft.ifft(f, axis=axis, **kwargs)
+        t = np.fft.ifft(self, axis=axis, **kwargs)
         t = TimeDomainSignal(t, meta=self.meta, unit=self.unit, description=description, f_sampling=f_sampling)
         return t
+
+    def fftshift(self):
+        self._check_x_axis_spacing("FFT shift")
+
+        f = FreqDomainSignal(np.fft.fftshift(self))
+        f.copy_attributes(self)
+        f.x_start = self.x_start - self.x_axis[self.shape[-1] // 2]
+
+        return f
+
+    def ifftshift(self):
+        self._check_x_axis_spacing("Inverse FFT shift")
+
+        f = FreqDomainSignal(np.fft.ifftshift(self))
+        f.copy_attributes(self)
+        f.x_start = self.x_axis[self.shape[-1] // 2]
+
+        return f
 
 
 if __name__ == '__main__':
