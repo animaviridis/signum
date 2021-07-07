@@ -113,7 +113,7 @@ class SignalContainer(np.ndarray):
         self.__dict__.update(_attributes)
 
     def toarray(self):
-        return np.array(self)
+        return self.view(np.ndarray)
 
     @property
     def defaults(self):
