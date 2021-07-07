@@ -112,6 +112,9 @@ class SignalContainer(np.ndarray):
         # update the instance attributes with the final set
         self.__dict__.update(_attributes)
 
+    def toarray(self):
+        return np.array(self)
+
     @property
     def defaults(self):
         """Return a dictionary of the default values for the envelope attributes."""
