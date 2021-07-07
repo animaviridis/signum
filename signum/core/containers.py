@@ -35,6 +35,21 @@ class TimeDomainSignal(BaseTimeDomainSignal):
 
         return self.csd(other=None, **kwargs)
 
+    def fft(self, zero_centered=False, axis=-1, description='', **kwargs):
+        f = np.fft.fft(self, axis=axis, **kwargs)
+        if zero_centered:
+            f = np.fft.fftshift(f)
+
+        n = self.shape[axis]
+        f_resolution = self.f_sampling/n
+        f_start = - f_resolution * (n//2) if zero_centered else 0
+        description = description or (f"FFT of {self.description}" if self.description else '')
+
+        f = FreqDomainSignal(f, f_resolution=f_resolution, description=description, meta=self.meta, unit=self.unit,
+                             x_start=f_start)
+
+        return f
+
 
 class FreqDomainSignal(BaseFreqDomainSignal):
     pass
