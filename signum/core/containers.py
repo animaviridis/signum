@@ -36,6 +36,8 @@ class TimeDomainSignal(BaseTimeDomainSignal):
         return self.csd(other=None, **kwargs)
 
     def fft(self, zero_centered=False, axis=-1, description='', **kwargs):
+        self._check_x_axis_spacing("a Fourier transform")
+
         f = np.fft.fft(self, axis=axis, **kwargs)
         if zero_centered:
             f = np.fft.fftshift(f)

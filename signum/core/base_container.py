@@ -471,3 +471,9 @@ class SignalContainer(np.ndarray):
         adjust_plot_scale(ax, y_unit=self.unit, y_label=self.description)
 
         return fig, axes
+
+    def _check_x_axis_spacing(self, label='requested operation'):
+        if self._nonstandard_x_axis is not None:
+            if np.unique(np.diff(self._nonstandard_x_axis)).size > 1:
+                raise ValueError(f"Cannot perform {label} on an array of non-equally spaced samples")
+
