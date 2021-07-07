@@ -42,9 +42,9 @@ class TimeDomainSignal(BaseTimeDomainSignal):
         if zero_centered:
             f = np.fft.fftshift(f)
 
-        n = self.shape[axis]
-        f_resolution = self.f_sampling/n
-        f_start = - f_resolution * (n//2) if zero_centered else 0
+        ns = self.shape[axis]
+        f_resolution = self.f_sampling/ns
+        f_start = - f_resolution * (ns//2) if zero_centered else 0
         description = description or (f"FFT of {self.description}" if self.description else '')
 
         f = FreqDomainSignal(f, f_resolution=f_resolution, description=description, meta=self.meta, unit=self.unit,
@@ -54,7 +54,19 @@ class TimeDomainSignal(BaseTimeDomainSignal):
 
 
 class FreqDomainSignal(BaseFreqDomainSignal):
-    pass
+    def ifft(self, zero_centered=False, axis=-1, description='', **kwargs):
+        self._check_x_axis_spacing("an inverse Fourier transform")
+
+        ns = self.shape[axis]
+        f_sampling = self.f_resolution * ns
+        description = description or (f"Inverse FFT of {self.description}" if self.description else '')
+
+        # perform an inverse fft shift if the spectrum is zero-centered
+        f = np.fft.ifftshift(self) if zero_centered else self.toarray()
+
+        t = np.fft.ifft(f, axis=axis, **kwargs)
+        t = TimeDomainSignal(t, meta=self.meta, unit=self.unit, description=description, f_sampling=f_sampling)
+        return t
 
 
 if __name__ == '__main__':
