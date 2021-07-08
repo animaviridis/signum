@@ -474,9 +474,10 @@ class SignalContainer(np.ndarray):
 
     def _check_x_axis_spacing(self, label='requested operation'):
         if self._nonstandard_x_axis is not None:
-            u = np.unique(np.diff(self._nonstandard_x_axis)).size
+            u = np.unique(np.diff(self._nonstandard_x_axis))
             m = np.median(u)
+            tolerance = 10 * np.finfo(u.dtype).resolution
 
-            if (np.abs(u - m) > 10*np.finfo(u.dtype).resolution).any():
+            if (np.abs(u - m) > tolerance).any():
                 raise ValueError(f"Cannot perform {label} on an array of non-equally spaced samples")
 
