@@ -27,3 +27,9 @@ class IQPlotter(Plotter):
         q_line, = self.q_ax.plot(signal.x_axis, signal.imag.T, **kwargs)
 
         return i_line, q_line
+
+    def _update_labels(self):
+        self.i_ax.set_ylabel(f"Real {self.unit_bracket}")
+        self.q_ax.set_ylabel(f"Imag {self.unit_bracket}")
+        self.q_ax.set_xlabel(f"{self.x_description} {self.x_unit_bracket}")
+

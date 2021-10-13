@@ -34,3 +34,8 @@ class BodePlotter(Plotter):
         phase_line, = self.phase_ax.plot(signal.x_axis, phase.T, **kwargs)
 
         return amplitude_line, phase_line
+
+    def _update_labels(self):
+        self.amplitude_ax.set_ylabel(f"Amplitude {'[db]' if self._db_scale else self.unit_bracket}")
+        self.phase_ax.set_xlabel(f"{self.x_description} {self.x_unit_bracket}")
+
