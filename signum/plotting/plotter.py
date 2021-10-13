@@ -15,6 +15,8 @@ class Plotter:
 
         self.fig = fig
         self.axes = axes
+        self.lines = {}
+        self.plot_data = {}
 
         if title:
             fig.suptitle(title)
@@ -44,7 +46,9 @@ class Plotter:
         if add_legend and 'label' in kwargs:
             self.add_legend()
 
-        return lines
+        k = kwargs.get('label', f'line {len(self.lines)}')
+        self.lines[k] = lines
+        self.plot_data[k] = signal
 
     def _add_line(self, signal, **kwargs):
         raise NotImplementedError
