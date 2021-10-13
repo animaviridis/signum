@@ -24,18 +24,12 @@ class BodePlotter(Plotter):
     def phase_ax(self) -> plt.Axes:
         return self.axes[1, 0]
 
-    def add_line(self, signal: SignalContainer, add_legend=True, **kwargs):
-        if signal.description and 'label' not in kwargs:
-            kwargs['label'] = signal.description
-
+    def _add_line(self, signal: SignalContainer, **kwargs):
         mag = signal.magnitude_db if self._db_scale else signal.magnitude
         amplitude_line, = self.amplitude_ax.plot(signal.x_axis, mag.T, **kwargs)
 
         phase = signal.get_phase(rad=self._rad, unwrapped=self._unwrapped)
         phase_line, = self.phase_ax.plot(signal.x_axis, phase.T, **kwargs)
-
-        if add_legend and 'label' in kwargs:
-            self.add_legend()
 
         return amplitude_line, phase_line
 

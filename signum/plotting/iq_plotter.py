@@ -20,15 +20,9 @@ class IQPlotter(Plotter):
     def q_ax(self) -> plt.Axes:
         return self.axes[1, 0]
 
-    def add_line(self, signal: SignalContainer, add_legend=True, **kwargs):
-        if signal.description and 'label' not in kwargs:
-            kwargs['label'] = signal.description
-
+    def _add_line(self, signal: SignalContainer, **kwargs):
         i_line, = self.i_ax.plot(signal.x_axis, signal.real.T, **kwargs)
         q_line, = self.q_ax.plot(signal.x_axis, signal.imag.T, **kwargs)
-
-        if add_legend and 'label' in kwargs:
-            self.add_legend()
 
         return i_line, q_line
 

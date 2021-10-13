@@ -1,6 +1,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
+from signum import SignalContainer
+
 
 class Plotter:
     def __init__(self, n_rows=1, n_cols=1, title=None, **kwargs):
@@ -30,3 +32,18 @@ class Plotter:
     @staticmethod
     def show_all(**kwargs):
         plt.show(**kwargs)
+
+    def add_line(self, signal: SignalContainer, add_legend=True, **kwargs):
+        if signal.description and 'label' not in kwargs:
+            kwargs['label'] = signal.description
+
+        lines = self._add_line(signal, **kwargs)
+
+        if add_legend and 'label' in kwargs:
+            self.add_legend()
+
+        return lines
+
+    def _add_line(self, signal, **kwargs):
+        raise NotImplementedError
+
