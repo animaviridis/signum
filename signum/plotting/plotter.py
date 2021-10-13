@@ -57,6 +57,9 @@ class SimplePlotter(Plotter):
         return self.axes[0, 0]
 
     def _add_line(self, signal, **kwargs):
+        if np.iscomplexobj(signal):
+            raise ValueError("Can't plot complex data on a SimplePlotter")
+
         line, = self.ax.plot(signal.x_axis, signal)
 
         return line,
