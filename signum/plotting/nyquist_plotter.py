@@ -1,7 +1,10 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from typing import TYPE_CHECKING
 
-from signum import SignalContainer, FreqDomainSignal
+if TYPE_CHECKING:
+    from signum import SignalContainer
+
 from signum.plotting.plotter import Plotter
 
 
@@ -19,7 +22,7 @@ class NyquistPlotter(Plotter):
     def ax(self) -> plt.Axes:
         return self.axes[0, 0]
 
-    def _add_line(self, signal: SignalContainer, set_equal_limits=True, **kwargs):
+    def _add_line(self, signal: 'SignalContainer', set_equal_limits=True, **kwargs):
         line, = self.ax.plot(signal.real.T, signal.imag.T, **kwargs)
 
         self.ax.relim()
@@ -33,6 +36,8 @@ class NyquistPlotter(Plotter):
 
 
 if __name__ == '__main__':
+    from signum import FreqDomainSignal
+
     s1 = FreqDomainSignal(np.random.rand(10) + 1j * np.random.rand(10), f_resolution=2, description='Random data')
 
     x = np.arange(20, step=0.1)

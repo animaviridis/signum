@@ -1,7 +1,9 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from typing import TYPE_CHECKING
 
-from signum import SignalContainer
+if TYPE_CHECKING:
+    from signum import SignalContainer
 
 
 class Plotter:
@@ -33,7 +35,7 @@ class Plotter:
     def show_all(**kwargs):
         plt.show(**kwargs)
 
-    def add_line(self, signal: SignalContainer, add_legend=True, **kwargs):
+    def add_line(self, signal: 'SignalContainer', add_legend=True, **kwargs):
         if signal.description and 'label' not in kwargs:
             kwargs['label'] = signal.description
 
@@ -56,7 +58,7 @@ class SimplePlotter(Plotter):
     def ax(self):
         return self.axes[0, 0]
 
-    def _add_line(self, signal, **kwargs):
+    def _add_line(self, signal: 'SignalContainer', **kwargs):
         if np.iscomplexobj(signal):
             raise ValueError("Can't plot complex data on a SimplePlotter")
 

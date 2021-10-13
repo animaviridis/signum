@@ -1,7 +1,10 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from typing import TYPE_CHECKING
 
-from signum import SignalContainer, TimeDomainSignal
+if TYPE_CHECKING:
+    from signum import SignalContainer
+
 from signum.plotting.plotter import Plotter
 
 
@@ -20,7 +23,7 @@ class IQPlotter(Plotter):
     def q_ax(self) -> plt.Axes:
         return self.axes[1, 0]
 
-    def _add_line(self, signal: SignalContainer, **kwargs):
+    def _add_line(self, signal: 'SignalContainer', **kwargs):
         i_line, = self.i_ax.plot(signal.x_axis, signal.real.T, **kwargs)
         q_line, = self.q_ax.plot(signal.x_axis, signal.imag.T, **kwargs)
 
@@ -28,6 +31,8 @@ class IQPlotter(Plotter):
 
 
 if __name__ == '__main__':
+    from signum import TimeDomainSignal
+
     s1 = TimeDomainSignal(np.random.rand(10) + 1j * np.random.rand(10), f_sampling=2, description='Random data')
 
     x = np.arange(-3, 3, 0.1)
