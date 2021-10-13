@@ -47,3 +47,16 @@ class Plotter:
     def _add_line(self, signal, **kwargs):
         raise NotImplementedError
 
+
+class SimplePlotter(Plotter):
+    def __init__(self, **kwargs):
+        super().__init__(n_rows=1, n_cols=1, **kwargs)
+
+    @property
+    def ax(self):
+        return self.axes[0, 0]
+
+    def _add_line(self, signal, **kwargs):
+        line, = self.ax.plot(signal.x_axis, signal)
+
+        return line,
