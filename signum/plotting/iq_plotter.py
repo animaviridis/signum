@@ -1,4 +1,3 @@
-import numpy as np
 import matplotlib.pyplot as plt
 from typing import TYPE_CHECKING
 
@@ -9,8 +8,8 @@ from signum.plotting.plotter import Plotter
 
 
 class IQPlotter(Plotter):
-    def __init__(self, figsize=(8, 6), **kwargs):
-        super().__init__(n_rows=2, n_cols=1, figsize=figsize, **kwargs)
+    def __init__(self, figsize=(8, 6), sharey='all', **kwargs):
+        super().__init__(n_rows=2, n_cols=1, sharex='all', sharey=sharey, figsize=figsize, **kwargs)
 
         self.i_ax.set_ylabel("Real")
         self.q_ax.set_ylabel("Imag")

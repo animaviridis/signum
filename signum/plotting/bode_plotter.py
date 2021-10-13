@@ -1,4 +1,3 @@
-import numpy as np
 import matplotlib.pyplot as plt
 from typing import TYPE_CHECKING
 
@@ -10,7 +9,7 @@ from signum.plotting.plotter import Plotter
 
 class BodePlotter(Plotter):
     def __init__(self, figsize=(8, 6), db_scale: bool = False, rad: bool = False, unwrapped: bool = False, **kwargs):
-        super().__init__(n_rows=2, n_cols=1, figsize=figsize, **kwargs)
+        super().__init__(n_rows=2, n_cols=1, sharex='all', figsize=figsize, **kwargs)
 
         self.amplitude_ax.set_ylabel(f"Amplitude{' [db]' if db_scale else ''}")
         self.phase_ax.set_ylabel(f"Phase [{'rad' if rad else 'deg'}]")
