@@ -191,10 +191,6 @@ class SignalContainer(np.ndarray):
 
         return wrapper
 
-    def __repr__(self):
-        return f"{self.description or ''}{': ' if self.description else ''}{self.__class__.__name__} object " \
-               f"containing {self.dtype} data array of shape {self.shape}"
-
     def __array_ufunc__(self, ufunc, method, *args, **kwargs):
 
         args_envelope = []

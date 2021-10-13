@@ -22,9 +22,6 @@ class BaseTimeDomainSignal(SignalContainer):
 
         return obj
 
-    def __repr__(self):
-        return super().__repr__() + f' sampled at {ScaleManager.display(self.f_sampling, "Hz")}'
-
     @property
     def resolution(self):
         return self._base_resolution * self._t_sampling
