@@ -1,14 +1,13 @@
 # based on: https://www.numpy.org/devdocs/user/basics.subclassing.html
 
-import matplotlib.pyplot as plt
-import numpy as np
 import logging
 from collections import abc
-from typing import Iterable, List, NamedTuple, Any
 from numbers import Number
+from typing import Iterable, List, NamedTuple, Any
 
-from signum.tools.plotting_tools import adjust_plot_scale
+import numpy as np
 
+from signum.plotting import plot_signal
 
 logger = logging.getLogger(__name__)
 
@@ -29,7 +28,7 @@ class SignalContainer(np.ndarray):
 
     def __new__(cls, data, unit: str = None, x_unit: str = None, description: str = None, x_description: str = None,
                 x_start: float = None, x_axis=None, resolution: float = None, meta: dict = None):
-        """Create a new instance of a DataContainer.
+        """Create a new instance of a SignalContainer.
 
         Parameters
         ----------
@@ -298,14 +297,6 @@ class SignalContainer(np.ndarray):
             self.x_start = 0
 
     @property
-    def x_label(self):
-        return self.x_description + (f' [{self.x_unit}]' if self.x_unit else '')
-
-    @property
-    def y_label(self):
-        return self.description + (f' [{self.unit}]' if self.unit else '')
-
-    @property
     def magnitude(self):
         mag = np.abs(self)
         mag.description = (self.description or '') + f' (magnitude)'
@@ -347,17 +338,17 @@ class SignalContainer(np.ndarray):
         ph.description = (ph.description or '') + ' (phase)'
         return ph
 
-    def display(self, complex_plot: str = 'bode', show: bool = True, title: str = None, **kwargs):
+    def display(self, plot_type: str = None, show: bool = False, title: str = None, **kwargs):
         """Create a plot to display the data.
 
         Parameters
         ----------
-        complex_plot    :   str
-            if the data is complex, this argument specifies the type of plot to be created. Available options:
-            'bode', 'nyquist', 'iq'. For real-valued data, this argument is ignored.
-        show            :   bool
+        plot_type   :   str
+            type of plot to be created. Available options: 'bode' (default for complex-valued data), 'nyquist', 'iq',
+             'polar', 'simple' (valid for real-valued data only).
+        show        :   bool
             if True, display the plot; setting to False allows later customisation before displaying it
-        title           :   str
+        title       :   str
             title for the plot; if not provided, the description of the signal is used
         kwargs
             additional keyword arguments passed to the specific plotting methods (or matplotlib.pyplot.plot)
@@ -366,111 +357,14 @@ class SignalContainer(np.ndarray):
         if self.size < 2:
             kwargs['marker'] = kwargs.get('marker', 'o')  # put a single dot if there is only one data point
 
-        if np.iscomplexobj(self):
-            if complex_plot == 'bode':
-                fig, axes = self._display_complex_bode(**kwargs)
-            elif complex_plot == 'nyquist':
-                fig, axes = self._display_complex_nyquist(**kwargs)
-            elif complex_plot == 'iq':
-                fig, axes = self._display_complex_iq(**kwargs)
-            else:
-                raise ValueError(f"Unknown complex plot type code: {complex_plot}; "
-                                 f"should be one of: 'bode', 'nyquist', 'iq'")
-        else:
-            fig, axes = self._display_real(**kwargs)
+        plot_kwargs = {}
 
-        for ax in axes:
-            ax.grid(color='lightgray')
+        for arg in ('unwrapped', 'db_scale', 'rad', 'figsize', 'sharey'):
+            if arg in kwargs:
+                plot_kwargs[arg] = kwargs.pop(arg)
 
-        if complex_plot != 'nyquist':
-            adjust_plot_scale(axes[-1], x_unit=self.x_unit, x_label=self.x_description)
-
-        fig.suptitle(title or self.description, fontsize=14)
-
-        if show:
-            plt.show()
-
-        return fig, axes
-
-    def _display_complex_bode(self, db_scale: bool = False, rad=False, unwrapped=False, figsize=(8, 6), **kwargs):
-        """Display a complex signal in a form of Bode plot (magnitude and phase).
-
-        Parameters
-        ----------
-        db_scale    :   bool
-            if True, display the magnitude in decibels.
-        rad         :   bool
-            if True, display the phase in radians; otherwise, use degrees
-        unwrapped   :   bool
-            if True, unwrap the phase to avoid 2pi (or 180 deg) jumps; otherwise, show phase in (-pi, pi) range
-            (or (-180, 180) for degrees)
-        figsize     :   2-tuple
-            figure size (passed to plt.subplots)
-        """
-
-        fig, axes = plt.subplots(2, 1, sharex='all', figsize=figsize)
-
-        mag = self.magnitude_db if db_scale else self.magnitude
-        axes[0].plot(mag.x_axis, mag.T, **kwargs)
-        adjust_plot_scale(axes[0], y_unit=mag.unit if not db_scale else None, y_label="Magnitude")
-
-        phase = self.get_phase(rad=rad, unwrapped=unwrapped)
-        axes[1].plot(phase.x_axis, phase.T, **kwargs)
-        axes[1].set_ylabel(f"Phase [{phase.unit}]")
-
-        return fig, axes
-
-    def _display_complex_iq(self, sharey='all', figsize=(8, 6), **kwargs):
-        """Display a complex signal in two subplots: real and imaginary part separately.
-
-        Parameters
-        ----------
-        sharey  :   str or bool
-            passed to matplotlib.pyplot.subplots; if 'all' (or True), the y axis of both subplots is shared.
-        figsize     :   2-tuple
-            figure size (passed to plt.subplots)
-        """
-
-        fig, axes = plt.subplots(2, 1, sharex='all', sharey=sharey, figsize=figsize)
-
-        axes[0].plot(self.x_axis, self.real.T, **kwargs)
-        adjust_plot_scale(axes[0], y_unit=self.unit, y_label="Real part")
-
-        axes[1].plot(self.x_axis, self.imag.T, **kwargs)
-        adjust_plot_scale(axes[1], y_unit=self.unit, y_label="Imaginary part")
-
-        return fig, axes
-
-    def _display_complex_nyquist(self, figsize=(6, 6), **kwargs):
-        """Display a complex-valued signal in a form of a Nyquist plot (imaginary vs real part)."""
-
-        fig, ax = plt.subplots(figsize=figsize)
-        axes = np.array([ax])
-
-        ax.set_aspect('equal')
-        ax.plot(self.real.T, self.imag.T, **kwargs)
-
-        ax.axvline(0, color='k', zorder=1)
-        ax.axhline(0, color='k', zorder=1)
-
-        adjust_plot_scale(ax, x_unit=self.unit, y_unit=self.unit, x_label="I component", y_label="Q component")
-
-        lim = np.max(np.abs([*ax.get_xlim(), *ax.get_ylim()]))
-        ax.set_xlim([-lim, lim])
-        ax.set_ylim([-lim, lim])
-
-        return fig, axes
-
-    def _display_real(self, figsize=(8, 5), **kwargs):
-        """Display a real-valued signal."""
-
-        fig, ax = plt.subplots(figsize=figsize)
-        axes = np.array([ax])
-
-        ax.plot(self.x_axis, self.T, **kwargs)
-        adjust_plot_scale(ax, y_unit=self.unit, y_label=self.description)
-
-        return fig, axes
+        plotter = plot_signal(self, plot_type=plot_type, show=show, title=title, plot_kwargs=plot_kwargs, **kwargs)
+        return plotter
 
     def _check_x_axis_spacing(self, label='requested operation'):
         if self._nonstandard_x_axis is not None:

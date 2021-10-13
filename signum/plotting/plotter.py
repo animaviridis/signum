@@ -1,12 +1,13 @@
-import numpy as np
-import matplotlib.pyplot as plt
 from copy import deepcopy
 from typing import TYPE_CHECKING
+
+import matplotlib.pyplot as plt
+import numpy as np
 
 if TYPE_CHECKING:
     from signum import SignalContainer
 
-from signum import ScaleManager
+from signum.tools.scale_manager import ScaleManager
 
 
 class Plotter:

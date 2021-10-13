@@ -1,11 +1,11 @@
-import numpy as np
-from matplotlib import mlab
 import logging
 
-from signum.tools.scale_manager import ScaleManager
+import numpy as np
+from matplotlib import mlab
+
 from signum.core.freq_domain_signal import BaseFreqDomainSignal as BaseFreqDomainSignal
 from signum.core.time_domain_signal import BaseTimeDomainSignal as BaseTimeDomainSignal
-
+from signum.tools.scale_manager import ScaleManager
 
 logger = logging.getLogger(__name__)
 
@@ -109,5 +109,5 @@ if __name__ == '__main__':
 
     fdata2.reshape(-1).display()
     fdata1.display()
-    fdata1.display(complex_plot='bode', db_scale=True)
-    fdata1.display(complex_plot='nyquist')
+    fdata1.display(plot_type='bode', db_scale=True)
+    fdata1.display(plot_type='nyquist')
