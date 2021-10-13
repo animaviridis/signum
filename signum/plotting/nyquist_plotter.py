@@ -33,17 +33,3 @@ class NyquistPlotter(Plotter):
             self.ax.set_ylim(-lim, lim)
 
         return line,
-
-
-if __name__ == '__main__':
-    from signum import FreqDomainSignal
-
-    s1 = FreqDomainSignal(np.random.rand(10) + 1j * np.random.rand(10), f_resolution=2, description='Random data')
-
-    x = np.arange(20, step=0.1)
-    s2 = FreqDomainSignal(x/20 * (np.cos(x) + 1j * np.sin(x)), x_axis=x)
-
-    plot = NyquistPlotter(title='Nyquist plot')
-    plot.add_line(s1, marker='d', linestyle=':')
-    plot.add_line(s2, color='crimson', label='Spiral')
-    plot.show_all()

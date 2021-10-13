@@ -35,17 +35,3 @@ class BodePlotter(Plotter):
         phase_line, = self.phase_ax.plot(signal.x_axis, phase.T, **kwargs)
 
         return amplitude_line, phase_line
-
-
-if __name__ == '__main__':
-    from signum import TimeDomainSignal
-
-    s1 = TimeDomainSignal(np.random.rand(10) + 1j * np.random.rand(10), f_sampling=2, description='Random data')
-
-    x = np.arange(-3, 3, 0.1)
-    s2 = TimeDomainSignal(x**2/2 - 2, description="x^2", x_axis=x)
-
-    plot = BodePlotter(title='Bode plot', unwrapped=True, rad=True)
-    plot.add_line(s1, marker='d')
-    plot.add_line(s2, color='crimson', label='Square func')
-    plot.show_all()

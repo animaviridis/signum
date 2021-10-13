@@ -62,6 +62,6 @@ class SimplePlotter(Plotter):
         if np.iscomplexobj(signal):
             raise ValueError("Can't plot complex data on a SimplePlotter")
 
-        line, = self.ax.plot(signal.x_axis, signal)
+        line, = self.ax.plot(signal.x_axis, signal, **kwargs)
 
         return line,
