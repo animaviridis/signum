@@ -235,9 +235,12 @@ class SignalContainer(np.ndarray):
         for result, output in zip(results, outputs):
             out = result if output is None else output
 
-            # convert back to DataContainer
-            rconv = np.asarray(out).view(self.__class__)
-            rconv.copy_attributes(self)
+            if isinstance(out, Number):
+                rconv = out
+            else:
+                # convert back to DataContainer
+                rconv = np.asarray(out).view(self.__class__)
+                rconv.copy_attributes(self)
             results_converted.append(rconv)
 
         return results_converted[0] if len(results_converted) == 1 else tuple(results_converted)
