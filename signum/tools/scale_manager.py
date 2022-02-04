@@ -1,7 +1,8 @@
-import numpy as np
-import re
 import logging
+import re
 from typing import Union
+
+import numpy as np
 
 logger = logging.getLogger(__name__)
 
@@ -191,10 +192,10 @@ class ScaleManager(object):
         return ScaleManager.rescale(data, unit, order_change=order_change)
 
     @staticmethod
-    def display(number: Union[float, complex], unit: str, precision: int = 2):
+    def display(number: Union[float, complex], unit: str, precision: int = 2, order_change=None):
         """Rescale a number and its unit and return a string representation with given decimal precision."""
 
-        n_rescaled, unit_rescaled = ScaleManager.rescale(number, unit)
+        n_rescaled, unit_rescaled = ScaleManager.rescale(number, unit, order_change=order_change)
         return f'{n_rescaled:.{precision}f} {unit_rescaled}'
 
 
