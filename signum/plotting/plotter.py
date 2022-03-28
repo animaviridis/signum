@@ -8,21 +8,24 @@ if TYPE_CHECKING:
     from signum import SignalContainer
 
 from signum.tools.scale_manager import ScaleManager
+from signum.plotting.scaled_axes import ScaledAxes
 
 
 class Plotter:
-    def __init__(self, n_rows=1, n_cols=1, title=None, unit=None, x_unit=None, **kwargs):
+    def __init__(self, n_rows=1, n_cols=1, title=None, **kwargs):
         fig, axes = plt.subplots(n_rows, n_cols, **kwargs)
         if n_rows == 1 and n_cols == 1:
             axes = np.array([axes])
         axes = axes.reshape(n_rows, n_cols)
 
+        for row in range(n_rows):
+            for col in range(n_cols):
+                axes[row, col] = ScaledAxes(axes[row, col])
+
         self.fig = fig
         self.axes = axes
         self.lines = {}
         self.plot_data = {}
-        self._unit = unit
-        self._x_unit = x_unit
 
         self.x_description = ''
         self.y_description = ''
