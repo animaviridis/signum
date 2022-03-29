@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+from matplotlib.projections.polar import PolarAxes
 import logging
 
 from signum.plotting.scaled_formatter import ScaledFormatter
@@ -15,7 +16,8 @@ class ScaledAxes:
             raise TypeError(f"Expected matplotlib.pyplot.Axes instance, got {type(ax)=}")
 
         self._ax = ax
-        ax.xaxis.set_major_formatter(ScaledFormatter(x_unit))
+        if not isinstance(ax, PolarAxes):
+            ax.xaxis.set_major_formatter(ScaledFormatter(x_unit))
         ax.yaxis.set_major_formatter(ScaledFormatter(y_unit))
 
         if x_label:
@@ -99,11 +101,12 @@ class ScaledAxes:
         data_units = {'x': data_x_unit, 'y': data_y_unit}
 
         for xy in 'xy':
-            ax_unit = getattr(self, f'get_{xy}_unit')()
-            data_unit = data_units[xy]
-            if ax_unit:
-                if ax_unit != data_unit:  # TODO: orders of magnitude
-                    raise ValueError(f"{xy} units of the axes and data do not agree: {ax_unit=}, {data_unit=}")
-            else:
-                logger.debug(f"Setting {xy} unit of the axes to data {xy} unit: {data_unit}")
-                getattr(self, f'set_{xy}_unit')(data_unit)
+            if isinstance(getattr(self.ax, f'{xy}axis').get_major_formatter(), ScaledFormatter):
+                ax_unit = getattr(self, f'get_{xy}_unit')()
+                data_unit = data_units[xy]
+                if ax_unit:
+                    if ax_unit != data_unit:  # TODO: orders of magnitude
+                        raise ValueError(f"{xy} units of the axes and data do not agree: {ax_unit=}, {data_unit=}")
+                else:
+                    logger.debug(f"Setting {xy} unit of the axes to data {xy} unit: {data_unit}")
+                    getattr(self, f'set_{xy}_unit')(data_unit)

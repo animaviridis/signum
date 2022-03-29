@@ -8,10 +8,12 @@ from signum.plotting.plotter import Plotter
 
 
 class PolarPlotter(Plotter):
-    def __init__(self, figsize=(6, 6), db_scale=False, **kwargs):
+    def __init__(self, figsize=(6, 6), db_scale=False, unit='', **kwargs):
         super().__init__(n_rows=1, n_cols=1, figsize=figsize, subplot_kw={'projection': 'polar'}, **kwargs)
 
         self._db_scale = db_scale
+
+        self.ax.set_y_unit(unit)
 
         self.ax.grid(color='lightgrey')
 

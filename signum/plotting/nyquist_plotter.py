@@ -9,11 +9,14 @@ from signum.plotting.plotter import Plotter
 
 
 class NyquistPlotter(Plotter):
-    def __init__(self, figsize=(6, 6), **kwargs):
+    def __init__(self, figsize=(6, 6), unit='', **kwargs):
         super().__init__(n_rows=1, n_cols=1, figsize=figsize, **kwargs)
 
         self.ax.set_xlabel("I component")
         self.ax.set_ylabel("Q component")
+        self.ax.set_x_unit(unit)
+        self.ax.set_y_unit(unit)
+
         self.ax.set_aspect("equal")
         self.ax.axvline(0, color='k', zorder=1)
         self.ax.axhline(0, color='k', zorder=1)
