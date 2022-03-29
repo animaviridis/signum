@@ -9,7 +9,7 @@ from signum.plotting.plotter import Plotter
 
 class BodePlotter(Plotter):
     def __init__(self, figsize=(8, 6), db_scale: bool = False, rad: bool = False, unwrapped: bool = False,
-                 unit='', x_unit='', **kwargs):
+                 unit='', x_unit='', x_label='', **kwargs):
         super().__init__(n_rows=2, n_cols=1, sharex='all', figsize=figsize, **kwargs)
 
         self.amplitude_ax.set_ylabel(f"Amplitude")
@@ -17,6 +17,7 @@ class BodePlotter(Plotter):
         self.phase_ax.set_ylabel(f"Phase")
         self.phase_ax.set_y_unit('rad' if rad else 'deg')
         self.phase_ax.set_x_unit(x_unit)
+        self.phase_ax.set_xlabel(x_label)
 
         self._db_scale = db_scale
         self._rad = rad

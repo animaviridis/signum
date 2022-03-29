@@ -8,11 +8,12 @@ from signum.plotting.plotter import Plotter
 
 
 class IQPlotter(Plotter):
-    def __init__(self, figsize=(8, 6), sharey='all', unit='', x_unit='', **kwargs):
+    def __init__(self, figsize=(8, 6), sharey='all', unit='', x_unit='', x_label='', **kwargs):
         super().__init__(n_rows=2, n_cols=1, sharex='all', sharey=sharey, figsize=figsize, **kwargs)
 
         self.i_ax.set_ylabel("Real")
         self.q_ax.set_ylabel("Imag")
+        self.q_ax.set_xlabel(x_label)
 
         self.i_ax.set_y_unit(unit)
         self.q_ax.set_y_unit(unit)
