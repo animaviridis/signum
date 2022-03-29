@@ -23,7 +23,7 @@ class NyquistPlotter(Plotter):
         return self.axes[0, 0]
 
     def _add_line(self, signal: 'SignalContainer', set_equal_limits=True, **kwargs):
-        line, = self.ax.plot(signal.real.T, signal.imag.T, **kwargs)
+        lines = self.ax.plot(signal.real.T, signal.imag.T, **kwargs)
 
         self.ax.relim()
 
@@ -32,4 +32,4 @@ class NyquistPlotter(Plotter):
             self.ax.set_xlim(-lim, lim)
             self.ax.set_ylim(-lim, lim)
 
-        return line,
+        return lines

@@ -1,4 +1,3 @@
-import numpy as np
 import matplotlib.pyplot as plt
 import logging
 
@@ -59,21 +58,29 @@ class ScaledAxes:
         self.set_y_unit(y_unit)
 
     def plot(self, *args, add_legend=True, **kwargs):
-        if len(args) == 2:
-            data, fmt = args
+        if len(args) == 3:
+            x_data, y_data, fmt = args
+        elif len(args) == 2:
+            if isinstance(args[1], str):
+                y_data, fmt = args
+                x_data = None
+            else:
+                x_data, y_data = args
+                fmt = None
         elif len(args) == 1:
-            data, = args
+            y_data, = args
+            x_data = None
             fmt = None
         else:
-            raise TypeError(f"Expected 1 or 2 positional arguments, got {len(args)}")
+            raise TypeError(f"Expected 1 to 3 positional arguments, got {len(args)}")
 
         try:
-            x_data = data.x_axis
-            y_data = data.view(np.ndarray)
-            x_unit = data.x_unit
-            y_unit = data.unit
+            x_unit = x_data.unit if x_data is not None else y_data.x_unit
+            y_unit = y_data.unit
+            x_data = x_data if x_data is not None else y_data.x_axis
+
         except AttributeError:
-            raise TypeError(f"Expected a SignalContainer instance, got {type(data)}")
+            raise TypeError(f"Expected a SignalContainer instance, got {type(y_data)}")
 
         self._fix_units(x_unit, y_unit)
 
@@ -99,4 +106,4 @@ class ScaledAxes:
                     raise ValueError(f"{xy} units of the axes and data do not agree: {ax_unit=}, {data_unit=}")
             else:
                 logger.debug(f"Setting {xy} unit of the axes to data {xy} unit: {data_unit}")
-                getattr(self, f'set_{xy}_unit', data_unit)
+                getattr(self, f'set_{xy}_unit')(data_unit)

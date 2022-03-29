@@ -23,13 +23,8 @@ class IQPlotter(Plotter):
         return self.axes[1, 0]
 
     def _add_line(self, signal: 'SignalContainer', **kwargs):
-        i_line, = self.i_ax.plot(signal.x_axis, signal.real.T, **kwargs)
-        q_line, = self.q_ax.plot(signal.x_axis, signal.imag.T, **kwargs)
+        i_lines = self.i_ax.plot(signal.real.T, **kwargs)
+        q_lines = self.q_ax.plot(signal.imag.T, **kwargs)
 
-        return i_line, q_line
-
-    def _update_labels(self):
-        self.i_ax.set_ylabel(f"Real {self.unit_bracket}")
-        self.q_ax.set_ylabel(f"Imag {self.unit_bracket}")
-        self.q_ax.set_xlabel(f"{self.x_description} {self.x_unit_bracket}")
+        return i_lines, q_lines
 

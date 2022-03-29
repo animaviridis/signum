@@ -23,6 +23,6 @@ class PolarPlotter(Plotter):
         mag = signal.magnitude_db if self._db_scale else signal.magnitude
         phase = signal.get_phase(rad=True)
 
-        line, = self.ax.plot(phase.T, mag.T, **kwargs)
+        lines = self.ax.plot(phase.T, mag.T, **kwargs)
 
-        return line,
+        return lines
