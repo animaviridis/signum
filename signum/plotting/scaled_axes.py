@@ -3,6 +3,7 @@ from matplotlib.projections.polar import PolarAxes
 import logging
 
 from signum.plotting.scaled_formatter import ScaledFormatter
+from signum.tools.scale_manager import ScaleManager
 
 
 _NOT_GIVEN_ = object()
@@ -84,7 +85,7 @@ class ScaledAxes:
         except AttributeError:
             raise TypeError(f"Expected a SignalContainer instance, got {type(y_data)}")
 
-        self._fix_units(x_unit, y_unit)
+        x_data, y_data = self._fix_units(x_data, y_data, x_unit, y_unit)
 
         plot_args = (x_data, y_data, fmt) if fmt is not None else (x_data, y_data)
         lines = self.ax.plot(*plot_args, **kwargs)
@@ -97,7 +98,8 @@ class ScaledAxes:
     def add_legend(self, fancybox=True, framealpha=0.5, **kwargs):
         self.ax.legend(fancybox=fancybox, framealpha=framealpha, **kwargs)
 
-    def _fix_units(self, data_x_unit, data_y_unit):
+    def _fix_units(self, data_x, data_y, data_x_unit, data_y_unit):
+        data = {'x': data_x, 'y': data_y}
         data_units = {'x': data_x_unit, 'y': data_y_unit}
 
         for xy in 'xy':
@@ -105,8 +107,15 @@ class ScaledAxes:
                 ax_unit = getattr(self, f'get_{xy}_unit')()
                 data_unit = data_units[xy]
                 if ax_unit:
-                    if ax_unit != data_unit:  # TODO: orders of magnitude
-                        raise ValueError(f"{xy} units of the axes and data do not agree: {ax_unit=}, {data_unit=}")
+                    if ax_unit != data_unit:
+                        _, ax_unit_core = ScaleManager.split_unit(ax_unit)
+                        _, data_unit_core = ScaleManager.split_unit(data_unit)
+                        if ax_unit_core != data_unit_core:
+                            raise ValueError(f"{xy} units of the axes and data do not agree: {ax_unit=}, {data_unit=}")
+                        order_change = ScaleManager.order_from_unit(ax_unit) - ScaleManager.order_from_unit(data_unit)
+                        data[xy], _ = ScaleManager.rescale(data[xy], data_unit, order_change)
                 else:
                     logger.debug(f"Setting {xy} unit of the axes to data {xy} unit: {data_unit}")
                     getattr(self, f'set_{xy}_unit')(data_unit)
+
+        return data['x'], data['y']
