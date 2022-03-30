@@ -102,7 +102,7 @@ class ScaledAxes:
             if isinstance(getattr(self.ax, f'{xy}axis').get_major_formatter(), ScaledFormatter):
                 ax_unit = getattr(self, f'get_{xy}_unit')()
                 data_unit = data_units[xy]
-                if data_unit is None:
+                if not data_unit:
                     logger.debug(f"{xy} data unit not specified")
                     continue
 
@@ -118,7 +118,7 @@ class ScaledAxes:
                             order_change = ScaleManager.order_from_unit(ax_unit) - ScaleManager.order_from_unit(data_unit)
                             data[xy], _ = ScaleManager.rescale(data[xy], data_unit, order_change)
 
-                elif data_unit:
+                else:
                     logger.debug(f"Setting {xy} unit of the axes to data {xy} unit: {data_unit}")
                     getattr(self, f'set_{xy}_unit')(data_unit)
 
