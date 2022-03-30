@@ -8,7 +8,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="signum",
-    version="0.3.4",
+    version="0.3.5",
     author="savetheginger",
     author_email="mysh995@gmail.com",
     description="NumPy-based signal data container tools",

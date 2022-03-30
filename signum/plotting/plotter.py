@@ -64,11 +64,14 @@ class Plotter:
 
 
 class SimplePlotter(Plotter):
-    def __init__(self, x_label='', y_label='', **kwargs):
+    def __init__(self, x_label='', y_label='', x_unit='', y_unit='', **kwargs):
         super().__init__(n_rows=1, n_cols=1, **kwargs)
 
         self.ax.set_xlabel(x_label)
         self.ax.set_ylabel(y_label)
+
+        self.ax.set_x_unit(x_unit)
+        self.ax.set_y_unit(y_unit)
 
     @property
     def ax(self):
