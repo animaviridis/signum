@@ -363,7 +363,7 @@ class SignalContainer(np.ndarray):
             if arg in kwargs:
                 plot_kwargs[arg] = kwargs.pop(arg)
 
-        if plot_type in ('bode', 'nyquist') and self.x_description is not None:
+        if plot_type in ('bode', 'iq') and self.x_description is not None:
             plot_kwargs['x_label'] = plot_kwargs.get('x_label', self.x_description)
 
         plotter = plot_signal(self, plot_type=plot_type, show=show, title=title, plot_kwargs=plot_kwargs, **kwargs)
