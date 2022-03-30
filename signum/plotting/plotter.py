@@ -1,12 +1,17 @@
 from typing import TYPE_CHECKING
 
 import matplotlib.pyplot as plt
+import matplotlib as mpl
 import numpy as np
 
 if TYPE_CHECKING:
     from signum import SignalContainer
 
 from signum.plotting.scaled_axes import ScaledAxes
+
+
+mpl.rcParams['axes.grid'] = True
+mpl.rcParams['grid.color'] = 'lightgrey'
 
 
 class Plotter:
@@ -27,9 +32,6 @@ class Plotter:
 
         if title:
             fig.suptitle(title)
-
-        for ax in axes.flatten():
-            ax.grid(color='lightgrey')
 
     def add_legend(self, **kwargs):
         """Add legend to each of the main grid axes."""
