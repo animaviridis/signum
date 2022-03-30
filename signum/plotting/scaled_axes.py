@@ -77,17 +77,13 @@ class ScaledAxes:
         else:
             raise TypeError(f"Expected 1 to 3 positional arguments, got {len(args)}")
 
-        try:
-            x_unit = x_data.unit if x_data is not None else y_data.x_unit
-            y_unit = y_data.unit
-            x_data = x_data if x_data is not None else y_data.x_axis
-
-        except AttributeError:
-            raise TypeError(f"Expected a SignalContainer instance, got {type(y_data)}")
+        x_unit = getattr(x_data, 'unit', None) if x_data is not None else getattr(y_data, 'x_unit', None)
+        y_unit = getattr(y_data, 'unit', None)
+        x_data = x_data if x_data is not None else getattr(y_data, 'x_axis', None)
 
         x_data, y_data = self._fix_units(x_data, y_data, x_unit, y_unit)
 
-        plot_args = (x_data, y_data, fmt) if fmt is not None else (x_data, y_data)
+        plot_args = tuple(it for it in (x_data, y_data, fmt) if it is not None)
         lines = self.ax.plot(*plot_args, **kwargs)
 
         if add_legend and 'label' in kwargs:
@@ -106,15 +102,23 @@ class ScaledAxes:
             if isinstance(getattr(self.ax, f'{xy}axis').get_major_formatter(), ScaledFormatter):
                 ax_unit = getattr(self, f'get_{xy}_unit')()
                 data_unit = data_units[xy]
+                if data_unit is None:
+                    logger.debug(f"{xy} data unit not specified")
+                    continue
+
                 if ax_unit:
                     if ax_unit != data_unit:
                         _, ax_unit_core = ScaleManager.split_unit(ax_unit)
                         _, data_unit_core = ScaleManager.split_unit(data_unit)
                         if ax_unit_core != data_unit_core:
                             raise ValueError(f"{xy} units of the axes and data do not agree: {ax_unit=}, {data_unit=}")
-                        order_change = ScaleManager.order_from_unit(ax_unit) - ScaleManager.order_from_unit(data_unit)
-                        data[xy], _ = ScaleManager.rescale(data[xy], data_unit, order_change)
-                else:
+
+                        if data[xy] is not None:
+                            logger.debug(f"Rescaling {xy} data from {data_unit} to {ax_unit}")
+                            order_change = ScaleManager.order_from_unit(ax_unit) - ScaleManager.order_from_unit(data_unit)
+                            data[xy], _ = ScaleManager.rescale(data[xy], data_unit, order_change)
+
+                elif data_unit:
                     logger.debug(f"Setting {xy} unit of the axes to data {xy} unit: {data_unit}")
                     getattr(self, f'set_{xy}_unit')(data_unit)
 
