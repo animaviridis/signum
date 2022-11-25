@@ -1,10 +1,10 @@
+import logging
+
 import matplotlib.pyplot as plt
 from matplotlib.projections.polar import PolarAxes
-import logging
 
 from signum.plotting.scaled_formatter import ScaledFormatter
 from signum.tools.scale_manager import ScaleManager
-
 
 _NOT_GIVEN_ = object()
 
@@ -24,7 +24,7 @@ class ScaledAxes:
         if x_label:
             self.set_xlabel(x_label)
         if y_label:
-            self.xet_ylabel(y_label)
+            self.set_ylabel(y_label)
 
     def __getattr__(self, item):
         return getattr(self._ax, item)
